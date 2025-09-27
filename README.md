@@ -39,6 +39,42 @@ Use the shellscript to evaluate. `indir` is the input directory of visible RGB i
 bash run_test_kaist512_vqf8.sh
 ```
 
+## SDGSAT-1 Remote Sensing Demo
+
+We provide a standalone script that demonstrates how to apply PID to
+SDGSAT-1 multi-spectral (MII) and thermal infrared (TIS) imagery.  The
+script performs radiometric calibration, resamples the thermal band to match
+the multi-spectral grid, and runs the pretrained PID checkpoint to predict a
+thermal image using the pseudo-RGB composite as the condition.
+
+1. Install `rasterio` (GDAL bindings are required).  If you are using the
+   provided Conda environment you can simply run
+
+   ```bash
+   conda install -c conda-forge rasterio
+   ```
+
+2. Execute the demo script with the SDGSAT-1 GeoTIFF files and a pretrained
+   PID checkpoint:
+
+   ```bash
+   python scripts/sdgsat_pid_demo.py \
+       --mii-paths \
+           E:/xunlei/KX10_MII_20250922_E121.24_N31.50_202500099050_L4B/KX10_MII_20250922_E121.24_N31.50_202500099050_L4B_A.tif \
+           E:/xunlei/KX10_MII_20250922_E121.24_N31.50_202500099050_L4B/KX10_MII_20250922_E121.24_N31.50_202500099050_L4B_B.tif \
+       --tir-path \
+           E:/download/KX10_TIS_20250922_E121.37_N31.90_202500099051_L4B/KX10_TIS_20250922_E121.37_N31.90_202500099051_L4B.tiff \
+       --config configs/latent-diffusion/config.yaml \
+       --checkpoint /path/to/pid.ckpt \
+       --outdir outputs/sdgsat-demo
+   ```
+
+   The script will create a pseudo-RGB preview, save the brightness
+   temperature estimate derived from the TIS band, and export the PID
+   prediction inside the output directory.  You can further customise the
+   radiometric coefficients via command-line arguments if the metadata of the
+   provided imagery differs from the default values.
+
 ## Train
 
 ### Dataset preparation
